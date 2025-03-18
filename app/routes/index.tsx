@@ -11,9 +11,9 @@ import {
   type DamageType,
   type Effect,
   type SpellArgs,
-} from "@/assets/scripts/gameplay/Spell"
+} from "@/gameplay/scripts/Spell"
 import type { LanguageCode } from "@/interfaces"
-import { scenes, type SceneName } from "@/assets/scripts/scenes"
+import { scenes, type SceneName } from "@/gameplay/scenes"
 
 export const Route = createFileRoute("/")({
   component: Home,
