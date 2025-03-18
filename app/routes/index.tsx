@@ -11,7 +11,7 @@ import {
   type DamageType,
   type Effect,
   type SpellArgs,
-} from "../assets/scripts/gameplay/Spell"
+} from "@/assets/scripts/gameplay/Spell"
 import type { LanguageCode } from "@/interfaces"
 import { scenes, type SceneName } from "@/assets/scripts/scenes"
 
