@@ -93,7 +93,7 @@ export class Spell {
       this.cost,
       this.damageType,
       this.effect,
-      this.areaType
+      this.areaType,
     )
   }
 
@@ -108,11 +108,11 @@ export class Spell {
 
     const dameTypeCost = this.damageType.reduce(
       (acc, type, i) => acc + DamageTypes.indexOf(type) * 3 + i * 0.5,
-      0
+      0,
     )
     const effectCost = this.effect.reduce(
       (acc, type, i) => acc + Effects.indexOf(type) * 1.5 + i * 0.5,
-      0
+      0,
     )
 
     const damageCost = this.damage ** 1.15
@@ -123,7 +123,7 @@ export class Spell {
         this.duration +
         damageCost +
         dameTypeCost +
-        effectCost
+        effectCost,
     )
   }
 }
@@ -133,7 +133,7 @@ export function generateSpellName(
   cost: number,
   damageType: DamageType[],
   effect: Effect[],
-  areaType: AreaType
+  areaType: AreaType,
 ) {
   const damageDescriptors = [
     "Weak",

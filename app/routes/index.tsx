@@ -1,16 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router"
+import dedent from "dedent"
+import { useState } from "react"
 import {
+  type AreaType,
   AreaTypes,
+  type DamageType,
   DamageTypes,
+  type Effect,
   Effects,
   Spell,
-  type AreaType,
-  type DamageType,
-  type Effect,
   type SpellArgs,
 } from "../Assets/Scripts/Gameplay/Spell"
-import { useState } from "react"
-import dedent from "dedent"
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -49,6 +49,7 @@ function Home() {
             {dialog?.options?.map((option) => (
               <button
                 key={option.text[lang]}
+                type="button"
                 className={buttonStyle}
                 onClick={goToScene(option.nextScene)}
               >
@@ -57,6 +58,7 @@ function Home() {
             )) ?? (
               <button
                 className={`${buttonStyle} h-fit self-center`}
+                type="button"
                 onClick={() => setDialogIndex(dialogIndex + 1)}
               >
                 Próximo
@@ -124,7 +126,7 @@ function TestGame() {
           ? `${
               isCritical ? "Critical " : ""
             }Attack ${spellIndex === -1 ? "Sword" : char.spells[spellIndex].name} hit for ${damage} damage`
-          : "Missed"
+          : "Missed",
     )
 
     setTurn(turn + 1)
@@ -175,11 +177,12 @@ function TestGame() {
       </div>
 
       <div className="flex gap-2">
-        <button className={buttonStyle} onClick={attack(-1)}>
+        <button type="button" className={buttonStyle} onClick={attack(-1)}>
           Sword Attack
         </button>
         {char.spells.map((spell, i) => (
           <button
+            type="button"
             key={spell.name}
             className={buttonStyle}
             disabled={char.mana < spell.cost}
@@ -227,9 +230,9 @@ function SpellBuilder() {
         </tr>
       </thead>
       <tbody>
-        {spells.map((spell, index) => (
+        {spells.map((spell) => (
           <tr
-            key={index}
+            key={spell.name}
             className="last:border-b-0 border-b border-stone-500 "
           >
             <td>{spell.name}</td>

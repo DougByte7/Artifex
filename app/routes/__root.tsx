@@ -1,10 +1,10 @@
-import type { ReactNode } from "react"
 import {
-  Outlet,
-  createRootRoute,
   HeadContent,
+  Outlet,
   Scripts,
+  createRootRoute,
 } from "@tanstack/react-router"
+import type { ReactNode } from "react"
 import appCss from "../app.css?url"
 import icon from "../icon.webp?url"
 
@@ -40,7 +40,7 @@ function RootComponent() {
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html>
+    <html lang="pt-BR">
       <head>
         <HeadContent />
       </head>
