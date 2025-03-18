@@ -13,7 +13,10 @@
     "ignore": ["**/*.gen.ts"],
     "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "nursery": {
+        "useSortedClasses": "error"
+      }
     }
   },
   "javascript": {
