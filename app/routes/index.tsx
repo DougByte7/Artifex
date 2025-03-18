@@ -1,16 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router"
-import dedent from "dedent"
+import DOMPurify from "dompurify"
 import { useState } from "react"
+
 import {
-  type AreaType,
   AreaTypes,
-  type DamageType,
   DamageTypes,
-  type Effect,
   Effects,
   Spell,
+  type AreaType,
+  type DamageType,
+  type Effect,
   type SpellArgs,
-} from "../Assets/Scripts/Gameplay/Spell"
+} from "../assets/scripts/gameplay/Spell"
+import type { LanguageCode } from "@/interfaces"
+import { scenes, type SceneName } from "@/assets/scripts/scenes"
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -20,6 +23,11 @@ function Home() {
   const lang: LanguageCode =
     (localStorage.getItem("lang") as LanguageCode) || "br"
 
+  const [sceneName, setSceneName] = useState(() => {
+    const currentSceneName: SceneName =
+      (localStorage.getItem("currentSceneName") as SceneName) || "start"
+    return currentSceneName
+  })
   const [currentScene, setCurrentScene] = useState(() => {
     const currentSceneName: SceneName =
       (localStorage.getItem("currentSceneName") as SceneName) || "start"
@@ -32,18 +40,28 @@ function Home() {
   const goToScene = (sceneName: SceneName) => () => {
     //localStorage.setItem("currentSceneName", sceneName)
     setCurrentScene(scenes.get(sceneName))
+    setSceneName(sceneName)
     setDialogIndex(0)
   }
 
   return (
-    <main className="p-8 grid gap-4">
+    <main className="grid gap-4 p-8">
       <SpellBuilder />
 
       <TestGame />
 
-      <section>
-        <div className="p-4 flex gap-4 border border-stone-500 rounded bg-stone-200/5 justify-between w-fit">
-          <p className="text-lg max-w-[75ch]">{dialog?.text[lang]}</p>
+      <section id="scene-text">
+        <div className="relative flex w-fit justify-between gap-4 rounded border border-stone-500 bg-stone-200/5 p-4">
+          <div className="-top-3 absolute rounded border border-stone-500 bg-stone-700 px-1 ">
+            {sceneName}
+          </div>
+          <p
+            className="max-w-[75ch] text-lg"
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: <explanation>
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(dialog?.text[lang] ?? ""),
+            }}
+          />
 
           <div className="grid w-fit gap-2">
             {dialog?.options?.map((option) => (
@@ -148,8 +166,8 @@ function TestGame() {
         Turno {turn} <strong>{hitInfo}</strong>
       </h1>
 
-      <div className="gap-4 flex">
-        <div className="p-4 grid gap-2 border border-stone-500 rounded bg-stone-200/5 w-fit">
+      <div className="flex gap-4">
+        <div className="grid w-fit gap-2 rounded border border-stone-500 bg-stone-200/5 p-4">
           <p>Name: {enemy.name}</p>
           <p>HP: {enemy.hp}</p>
           <p>Reactions: {enemy.reactions}</p>
@@ -161,7 +179,7 @@ function TestGame() {
           </p>
         </div>
 
-        <div className="p-4 grid gap-2 border border-stone-500 rounded bg-stone-200/5 w-fit">
+        <div className="grid w-fit gap-2 rounded border border-stone-500 bg-stone-200/5 p-4">
           <p>Hollow lv. 1</p>
           <p>
             HP: {char.hp} / {char.strength / 2}
@@ -210,7 +228,7 @@ function SpellBuilder() {
   const customSpell = new Spell(spell)
 
   return (
-    <table className="border border-stone-500 [&_tr>*:not(:first-child)]:border-l-2 [&_tr>*:not(:first-child)]:border-stone-500 [&_tr>*]:px-2 text-center">
+    <table className="border border-stone-500 text-center [&_tr>*:not(:first-child)]:border-stone-500 [&_tr>*:not(:first-child)]:border-l-2 [&_tr>*]:px-2">
       <caption>Spells</caption>
       <thead>
         <tr>
@@ -233,7 +251,7 @@ function SpellBuilder() {
         {spells.map((spell) => (
           <tr
             key={spell.name}
-            className="last:border-b-0 border-b border-stone-500 "
+            className="border-stone-500 border-b last:border-b-0 "
           >
             <td>{spell.name}</td>
             <td>{spell.areaRadiusOrDepth}</td>
@@ -445,119 +463,3 @@ function buildEnemy() {
     agility: randomBetween(5, 1),
   }
 }
-
-interface Scene {
-  bgImage: string
-  bgMusic: string
-  dialogs: Dialog[]
-}
-
-type SceneText = Record<LanguageCode, string>
-
-interface Dialog {
-  text: SceneText
-  options?: Option[]
-}
-
-interface Option {
-  text: SceneText
-  nextScene: SceneName
-}
-
-type LanguageCode = "br"
-type SceneName =
-  | "start"
-  | "tavern"
-  | "inn"
-  | "fight"
-  | "reveal"
-  | "church"
-  | "lake"
-
-const scenes = new Map<SceneName, Scene>()
-scenes.set("start", {
-  bgImage: "",
-  bgMusic: "calm dark forest",
-  dialogs: [
-    {
-      text: {
-        br: dedent`Após uma loga viagem você enfim chega a seu destino. Do topo de uma colina você observa.
-        Escondida à sombra da macabra *Floresta Negra*, a vila de *Dusk Hollow* se encontra em um estado de 
-        abandono e decadência. Suas muralhas outrora protetoras agora estão em ruínas, com trechos inteiros 
-        desmoronados e engolidos pela vegetação retorcida. O ar é denso, carregado com a umidade do lago próximo 
-        e o cheiro de madeira podre e terra encharcada.`,
-        // en: `After a long journey you finally arrive at Dusk Hollow. On top of a cliff you see the village.
-        // The view would be fantastic, if the place wasn't falling apart and the dark aura of the Black Forest didn't
-        // swallow you up.`,
-        // jp: "あなたはダスクホールに到着しました。クリップの上で、村が見えます。その上の山からは、ダスクホールのような、美しい見所があります。",
-      },
-    },
-    {
-      text: {
-        br: dedent`Ao passar pelos portões você se depara com construções de madeira decrépitas, com telhados de colmo 
-        esburacados, inclinam-se como se prestes a desabar, rangendo ao menor sopro de vento. As ruas enlameadas tornam 
-        cada passo um esforço, e uma carroça quebrada, abandonada e coberta de musgo, bloqueia a passagem principal, 
-        como se o tempo tivesse esquecido este lugar.`,
-        // en: "You enter the village.",
-      },
-      options: [
-        {
-          text: {
-            br: "Ir para a taverna",
-            // en: "Go to the tavern",
-          },
-          nextScene: "tavern",
-        },
-        {
-          text: {
-            br: "Ir para estalagem",
-            // en: "Go to the inn",
-          },
-          nextScene: "inn",
-        },
-        {
-          text: {
-            br: "Ir para a igreja",
-          },
-          nextScene: "church",
-        },
-        {
-          text: {
-            br: "Ir para o lago",
-          },
-          nextScene: "lake",
-        },
-      ],
-    },
-  ],
-})
-
-scenes.set("tavern", {
-  bgImage:
-    "Uma taverna modesta, com uma parede de pedra e um bar. Um homem brande uma adaga ameaçando dois clientes numa mesa.",
-  bgMusic: "tavern",
-  dialogs: [
-    {
-      text: {
-        br: "Um baderneiro ameaça os clientes",
-        // en: "A troublemaker blackmail the clients",
-      },
-      options: [
-        {
-          text: {
-            br: "Lutar",
-            // en: "Fight",
-          },
-          nextScene: "fight",
-        },
-        {
-          text: {
-            br: "Revelar sua identidade",
-            // en: "Reveal your identity",
-          },
-          nextScene: "reveal",
-        },
-      ],
-    },
-  ],
-})
