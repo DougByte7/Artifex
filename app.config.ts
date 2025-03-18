@@ -1,7 +1,6 @@
 import { defineConfig } from "@tanstack/react-start/config"
 import tsConfigPaths from "vite-tsconfig-paths"
 import tailwindcss from "@tailwindcss/vite"
-import path from "node:path"
 
 export default defineConfig({
   vite: {
@@ -11,10 +10,8 @@ export default defineConfig({
         projects: ["./tsconfig.json"],
       }),
     ],
-    resolve: {
-      alias: {
-        "@": path.resolve(__dirname, "./app"),
-      },
-    },
+  },
+  server: {
+    preset: "vercel",
   },
 })
