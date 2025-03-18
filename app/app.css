@@ -1,3 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+#scene-text {
+  strong {
+    @apply text-yellow-500;
+  }
+
+  em {
+    @apply text-teal-500;
+  }
+}
