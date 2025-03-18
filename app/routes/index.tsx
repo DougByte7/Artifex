@@ -142,8 +142,8 @@ function TestGame() {
         ? "Dodged"
         : doesHit
           ? `${
-              isCritical ? "Critical " : ""
-            }Attack ${spellIndex === -1 ? "Sword" : char.spells[spellIndex].name} hit for ${damage} damage`
+              isCritical ? `<span class="text-green-500">Critical </span>` : ""
+            }Attack <span class="text-blue-500">${spellIndex === -1 ? "Sword" : char.spells[spellIndex].name}</span> hit for <span class="text-red-500">${damage} damage</span>`
           : "Missed",
     )
 
@@ -163,7 +163,8 @@ function TestGame() {
   return (
     <section className="grid gap-4">
       <h1>
-        Turno {turn} <strong>{hitInfo}</strong>
+        Turno {/* biome-ignore lint/security/noDangerouslySetInnerHtml: <explanation> */}
+         {turn} <strong dangerouslySetInnerHTML={{ __html: hitInfo }} />
       </h1>
 
       <div className="flex gap-4">
