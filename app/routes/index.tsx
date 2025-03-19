@@ -14,6 +14,8 @@ import {
 } from "@/gameplay/scripts/Spell"
 import type { LanguageCode } from "@/interfaces"
 import { scenes, type SceneName } from "@/gameplay/scenes"
+import { BattleScene } from "@/components/game/battle-scene"
+import { Button } from "@/components/ui/button"
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -48,7 +50,7 @@ function Home() {
     <main className="grid gap-4 p-8">
       <SpellBuilder />
 
-      <TestGame />
+      <BattleScene />
 
       <section id="scene-text">
         <div className="relative flex w-fit justify-between gap-4 rounded border border-stone-500 bg-stone-200/5 p-4">
@@ -65,153 +67,21 @@ function Home() {
 
           <div className="grid w-fit gap-2">
             {dialog?.options?.map((option) => (
-              <button
+              <Button
                 key={option.text[lang]}
-                type="button"
-                className={buttonStyle}
                 onClick={goToScene(option.nextScene)}
               >
                 {option.text[lang]}
-              </button>
+              </Button>
             )) ?? (
-              <button
-                className={`${buttonStyle} h-fit self-center`}
-                type="button"
-                onClick={() => setDialogIndex(dialogIndex + 1)}
-              >
+              <Button onClick={() => setDialogIndex(dialogIndex + 1)}>
                 Próximo
-              </button>
+              </Button>
             )}
           </div>
         </div>
       </section>
     </main>
-  )
-}
-
-function TestGame() {
-  const [char, setCharacter] = useState(character)
-  const [enemy, setEnemy] = useState(buildEnemy())
-  const [hitInfo, setInfo] = useState("")
-  const [turn, setTurn] = useState(1)
-
-  const attack = (spellIndex: number) => () => {
-    const isSword = spellIndex === -1
-
-    const manaCost = isSword ? -char.will * 5 : char.spells[spellIndex].cost
-
-    const attackChance =
-      randomBetween(6, 1) + (isSword ? char.strength : char.will)
-    const doesHit = attackChance > 4
-    const isCritical = attackChance > 6
-    const hasReaction = enemy.reactions > 0
-    const willUseReaction =
-      doesHit && hasReaction
-        ? Math.random() < enemy.reactionChance ||
-          (isCritical && Math.random() < enemy.reactionChance)
-        : false
-    const dodged = willUseReaction
-      ? randomBetween(6, 1) + (isSword ? enemy.strength : enemy.agility) >
-        (isCritical ? 6 : 4)
-      : false
-
-    const damage =
-      dodged || !doesHit
-        ? 0
-        : isSword
-          ? isCritical
-            ? char.strength * 2
-            : char.strength
-          : isCritical
-            ? (char.spells[spellIndex].damage + char.will / 2) | 0
-            : char.spells[spellIndex].damage
-
-    setCharacter((prev) => ({
-      ...prev,
-      mana: Math.min(prev.mana - manaCost, manaFormula(prev.will)),
-    }))
-
-    setEnemy((prev) => ({
-      ...prev,
-      hp: prev.hp - damage,
-      reactions: willUseReaction ? prev.reactions - 1 : prev.reactions,
-    }))
-
-    setInfo(
-      dodged
-        ? "Dodged"
-        : doesHit
-          ? `${
-              isCritical ? `<span class="text-green-500">Critical </span>` : ""
-            }Attack <span class="text-blue-500">${spellIndex === -1 ? "Sword" : char.spells[spellIndex].name}</span> hit for <span class="text-red-500">${damage} damage</span>`
-          : "Missed",
-    )
-
-    setTurn(turn + 1)
-  }
-
-  const react = () => {
-    const reaction = char.spells[1]
-    if (Math.random() < enemy.reactionChance) {
-      setEnemy((prev) => ({
-        ...prev,
-        reactions: prev.reactions - 1,
-      }))
-    }
-  }
-
-  return (
-    <section className="grid gap-4">
-      <h1>
-        Turno {/* biome-ignore lint/security/noDangerouslySetInnerHtml: <explanation> */}
-         {turn} <strong dangerouslySetInnerHTML={{ __html: hitInfo }} />
-      </h1>
-
-      <div className="flex gap-4">
-        <div className="grid w-fit gap-2 rounded border border-stone-500 bg-stone-200/5 p-4">
-          <p>Name: {enemy.name}</p>
-          <p>HP: {enemy.hp}</p>
-          <p>Reactions: {enemy.reactions}</p>
-          <p>Reaction Chance: {(enemy.reactionChance * 100).toFixed(2)}%</p>
-          <p>Strength: {enemy.strength}</p>
-          <p>Agility: {enemy.agility}</p>
-          <p>
-            Power: {enemy.hp + enemy.reactions + enemy.strength + enemy.agility}
-          </p>
-        </div>
-
-        <div className="grid w-fit gap-2 rounded border border-stone-500 bg-stone-200/5 p-4">
-          <p>Hollow lv. 1</p>
-          <p>
-            HP: {char.hp} / {char.strength / 2}
-          </p>
-          <p>
-            Mana: {char.mana} / {manaFormula(char.will)}
-          </p>
-          <p>Reactions: {char.reactions}</p>
-          <p>Strength: {char.strength}</p>
-          <p>Agility: {char.agility}</p>
-          <p>Will: {char.will}</p>
-        </div>
-      </div>
-
-      <div className="flex gap-2">
-        <button type="button" className={buttonStyle} onClick={attack(-1)}>
-          Sword Attack
-        </button>
-        {char.spells.map((spell, i) => (
-          <button
-            type="button"
-            key={spell.name}
-            className={buttonStyle}
-            disabled={char.mana < spell.cost}
-            onClick={attack(i)}
-          >
-            {spell.name} - {spell.cost} MP - {spell.damage} Dmg
-          </button>
-        ))}
-      </div>
-    </section>
   )
 }
 
@@ -386,9 +256,6 @@ function SpellBuilder() {
   )
 }
 
-const buttonStyle =
-  "disabled:bg-stone-500 disabled:text-stone-300 disabled:cursor-not-allowed bg-yellow-500 hover:bg-yellow-700 hover:text-stone-100 border border-stone-900  text-stone-800 font-bold py-2 px-4 rounded transition-colors"
-
 const spells: Spell[] = [
   new Spell({
     areaRadiusOrDepth: 10,
@@ -427,40 +294,3 @@ const spells: Spell[] = [
     effect: ["None"],
   }),
 ]
-
-// Start with 10 points
-// Strength determines how much damage you do with weapons, and your hp
-// Agility determines your accuracy ranged attacks, and your reactions
-// Will determines how much mana you can spend on spells
-// You gain 5 points per level
-const manaFormula = (will: number) => 80 + will * 10
-const character = {
-  strength: 4,
-  agility: 2,
-  will: 2,
-  get hp() {
-    return this.strength / 2
-  },
-  get reactions() {
-    return this.agility / 2
-  },
-  get mana() {
-    return manaFormula(this.will)
-  },
-  spells,
-}
-
-function randomBetween(max = 1, min = 0) {
-  return Math.floor(Math.random() * (max - min + 1)) + min
-}
-
-function buildEnemy() {
-  return {
-    name: "Enemy",
-    hp: randomBetween(13, 3),
-    reactions: randomBetween(3, 1),
-    reactionChance: randomBetween(0.5, 0.3) + Math.random(),
-    strength: randomBetween(5, 1),
-    agility: randomBetween(5, 1),
-  }
-}
