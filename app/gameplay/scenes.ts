@@ -27,6 +27,7 @@ export type SceneName =
   | "reveal"
   | "church"
   | "lake"
+  | "tavern-garrik"
   | "tavern-fight"
 
 export const scenes = new Map<SceneName, Scene>()
@@ -89,16 +90,21 @@ scenes.set("start", {
 })
 
 scenes.set("tavern-trouble", {
-  bgImage:
-    "Uma taverna modesta, com uma parede de pedra e um bar. Um homem brande uma adaga ameaçando dois clientes numa mesa.",
+  bgImage: "",
   bgMusic: "tavern",
   dialogs: [
     {
       text: {
         br: dedent`
         A Taverna <strong>O Último Suspiro</strong> ainda resiste ao tempo, suas janelas embaçadas deixando escapar um 
-        fraco brilho amarelado, um convite tanto para viajantes exaustos quanto para almas condenadas.
-        <br /><br />
+        fraco brilho amarelado, um convite tanto para viajantes exaustos quanto para almas condenadas.       
+        `,
+        // en: "A troublemaker blackmail the clients",
+      },
+    },
+    {
+      text: {
+        br: dedent`         
         O lugar é de teto baixo, iluminado por velas tremeluzentes e um grande candelabro enferrujado que 
         balança levemente a cada rajada de vento. O cheiro forte de cerveja azeda, madeira úmida e suor 
         paira no ar, misturado com o murmúrio dos poucos frequentadores; mercenários cansados, viajantes desconfiados 
@@ -124,14 +130,7 @@ scenes.set("tavern-trouble", {
           text: {
             br: '"E quem é você?"',
           },
-          nextScene: "tavern-fight",
-        },
-        {
-          text: {
-            br: "Lutar",
-            // en: "Fight",
-          },
-          nextScene: "fight",
+          nextScene: "tavern-garrik",
         },
         {
           text: {
@@ -141,6 +140,60 @@ scenes.set("tavern-trouble", {
           nextScene: "reveal",
         },
       ],
+    },
+  ],
+})
+
+scenes.set("tavern-garrik", {
+  bgImage: "",
+  bgMusic: "",
+  dialogs: [
+    {
+      text: {
+        br: dedent`
+       A tensão na taverna cresce quando você encara o homem à sua frente. Seu uniforme desalinhado e a postura 
+       arrogante são suficientes para deixar claro que ele já fez isso antes—e saiu impune. Mas hoje, ele escolheu
+       a pessoa errada.
+       <br/><em>"E quem diabos é você para cobrar essa taxa?"</em><br/>
+       sua voz ressoa no salão, fazendo alguns clientes pararem de murmurar e desviarem o olhar.
+       O homem estufa o peito, exalando uma confiança descuidada.
+       <br/><em>"Sou Garrik, chefe da guarda local. E esta cidade tem suas regras. Se quer andar por aqui 
+       sem problemas, melhor respeitá-las."</em><br/>
+        `,
+      },
+      options: [
+        {
+          text: {
+            br: "Lutar contra o homem",
+          },
+          nextScene: "tavern-fight",
+        },
+        {
+          text: {
+            br: "Revelar sua identidade",
+            // en: "Reveal your identity",
+          },
+          nextScene: "reveal",
+        },
+      ],
+    },
+  ],
+})
+
+scenes.set("tavern-fight", {
+  bgImage: "",
+  bgMusic: "",
+  dialogs: [
+    {
+      text: {
+        br: dedent`        
+         Você solta um riso seco antes de responder, sua voz carregada de uma ameaça velada:
+         <br/><em>"A guarda não deveria extorquir seus cidadãos… nem seus visitantes."</em><br/>
+         Por um instante, há silêncio. O olhar de Garrik endurece, e sua mão desliza para a lâmina no cinturão.
+         Mas antes que ele possa reagir, você se levanta num movimento fluido e o golpeia com a força de 
+         alguém que não precisa provar nada, apenas lembrar quem está no comando.
+          `,
+      },
     },
   ],
 })
